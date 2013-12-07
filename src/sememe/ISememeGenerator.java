@@ -1,6 +1,7 @@
 package sememe;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public interface ISememeGenerator {
 	public String generateArrayAccessOperator();
@@ -91,10 +92,10 @@ public interface ISememeGenerator {
 	public String generateLongLiteralSememe(String value);
 
 	public String generateMethodDeclarationSememe(String owner, String name,
-			ArrayList<String> paraNames, String rettype);
+			List<String> paraNames, String rettype);
 
 	public String generateMethodReference(String owner, String name,
-			ArrayList<String> paramTypes, String rettype);
+			List<Object> paramTypes, String rettype);
 
 	public String generateMinusAssignmentSememe();
 
@@ -157,4 +158,14 @@ public interface ISememeGenerator {
 	public String generateWhileBegin();
 
 	public String generateWhileEnd();
+	
+	public String generateMethodBegin();
+	
+	public String generateMethodEnd();
+
+	public String generatePackageSememe(String name);
+	
+	public String generatePositiveSememe();
+	
+	public String generateNegativeSememe();
 }

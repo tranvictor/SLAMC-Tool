@@ -84,6 +84,7 @@ public class GettingStarted {
 				System.out.println(true);
 			}
 		}
+                this.intMember = 10;
 	}
 
         public static void main(String[] args){
