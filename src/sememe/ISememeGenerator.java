@@ -1,6 +1,5 @@
 package sememe;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public interface ISememeGenerator {
@@ -35,9 +34,6 @@ public interface ISememeGenerator {
 	public String generateClassDeclarationSememe();
 
 	public String generateClassEndSememe();
-
-	public String generateConstructorReference(String owner,
-			ArrayList<String> paramTypes);
 
 	public String generateDivideAssignmentSememe();
 

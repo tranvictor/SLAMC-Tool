@@ -84,6 +84,8 @@ public abstract class AbstractSememe implements Hashable{
 	public static final int PACKAGE_SEMEME = 79;
 	public static final int NEGATIVE_SEMEME = 80;
 	public static final int POSITIVE_SEMEME = 81;
+	public static final	int ACCESS_OPERATOR = 82;
+	public static final int SPECIAL_CONSTRUCTOR_REFERENCE = 83;
 	
 	
 	protected String sememe;

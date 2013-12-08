@@ -5,6 +5,10 @@ import structure.Hashable;
 public class Lexeme implements Hashable {
 	private String lexeme;
 	
+	public Lexeme(String l){
+		this.lexeme = l;
+	}
+	
 	public String getLexeme() {
 		return lexeme;
 	}

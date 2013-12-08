@@ -1,6 +1,5 @@
 package sememe;
 
-import java.util.ArrayList;
 import java.util.List;
 
 
@@ -560,16 +559,16 @@ public class SememeGenerator implements ISememeGenerator{
 	/* (non-Javadoc)
 	 * @see sememe.ISememeGenerator#generateConstructorReference(java.lang.String, java.util.ArrayList)
 	 */
-	@Override
-	public String generateConstructorReference(String owner,
-			ArrayList<String> paramTypes) {
-		String params = "PARA[";
-		for (String p : paramTypes){
-			params += p + ",";
-		}
-		params += "]";
-		return String.format("CONSTRUCT[%s,%s]", owner, params);
-	}
+//	@Override
+//	public String generateConstructorReference(String owner,
+//			ArrayList<String> paramTypes) {
+//		String params = "PARA[";
+//		for (String p : paramTypes){
+//			params += p + ",";
+//		}
+//		params += "]";
+//		return String.format("CONSTRUCT[%s,%s]", owner, params);
+//	}
 
 	/* (non-Javadoc)
 	 * @see sememe.ISememeGenerator#generateSwitchBegin()
@@ -665,5 +664,14 @@ public class SememeGenerator implements ISememeGenerator{
 	
 	public String generateNegativeSememe() {
 		return "OP[Neg]";
+	}
+
+	public String generateAccessOperator() {
+		return "OP[Access]";
+	}
+
+	public String generateConstructorReference(String owner, String name,
+			List<Object> paramTypes) {
+		return String.format("CONSTRUCT[%s,%s,%s]", owner, name, paramTypes.size());
 	}
 }

@@ -118,14 +118,13 @@ import recoder.service.SourceInfo;
 import sememe.AbstractSememe;
 import sememe.Sememe;
 import sememe.SememeGenerator;
-import structure.SememeContainer;
+import structure.SememeSequence;
 
 public class CustomVisitor extends SourceVisitor {
     private SememeGenerator generator = new SememeGenerator();
     //private CrossReferenceServiceConfiguration crsc;
     private SourceInfo si;
-    private List<AbstractSememe> sequence = new ArrayList<AbstractSememe>();
-    private SememeContainer sememContainer = new SememeContainer();
+    private SememeSequence sequence = new SememeSequence();
     private Stack<ClassDeclaration> classStack = new Stack<ClassDeclaration>();
     
     public CustomVisitor(CrossReferenceServiceConfiguration crsc) {
@@ -148,7 +147,8 @@ public class CustomVisitor extends SourceVisitor {
         classStack.push(cd);
         sequence.add(new Sememe(generator.generateClassDeclarationSememe(), 
                                 cd.getStartPosition(),
-                                Sememe.CLASS_DECLARATION_SEMEME));
+                                Sememe.CLASS_DECLARATION_SEMEME),
+                     cd);
 //        sequence.add(new Sememe(generator.generateClassBeginSememe(), cd.getStartPosition()));
         for (MemberDeclaration c : cd.getMembers()){
             if (c instanceof FieldDeclaration){
@@ -170,7 +170,7 @@ public class CustomVisitor extends SourceVisitor {
         List<FieldSpecification> variables = fd.getVariables();
         sequence.add(new Sememe(generator.generateTypeSememe(type.getName()),
                 fd.getStartPosition(),
-                Sememe.TYPE_SEMEME));
+                Sememe.TYPE_SEMEME), type);
         for (FieldSpecification v : variables){
             System.out.println(v.toSource());
             System.out.println(v.getExpressionCount());
@@ -180,7 +180,7 @@ public class CustomVisitor extends SourceVisitor {
             if (v.getExpressionCount() == 1){
                 sequence.add(new Sememe(generator.generateAssignSememe(), 
                                         fd.getStartPosition(),
-                                        Sememe.ASSIGN_SEMEME));
+                                        Sememe.ASSIGN_SEMEME), null);
                 this.visitExpression(v.getExpressionAt(0));
             } else if (v.getExpressionCount() > 1){
                 GlobalConfig.LOGGER.log("Unhandled field declaration initialization: " + v.getClass() + "|" + v.toSource());
@@ -406,7 +406,7 @@ public class CustomVisitor extends SourceVisitor {
         this.visitExpression(left);
         sequence.add(new Sememe(generator.generateAssignSememe(), 
                                 ca.getStartPosition(),
-                                Sememe.ASSIGN_SEMEME));
+                                Sememe.ASSIGN_SEMEME), null);
         this.visitExpression(right);
     }    
     
@@ -611,7 +611,7 @@ public class CustomVisitor extends SourceVisitor {
         this.visitExpression(ar.getExpressionAt(0));
         sequence.add(new Sememe(generator.generateArrayAccessOperator(), 
                                 ar.getStartPosition(),
-                                Sememe.ARRAY_ACCESS_OPERATOR));
+                                Sememe.ARRAY_ACCESS_OPERATOR), null);
         this.visitExpression(ar.getExpressionAt(1));
     }
     
@@ -624,7 +624,14 @@ public class CustomVisitor extends SourceVisitor {
     
     public void visitFieldReference(FieldReference fr){
         ReferencePrefix prefix = fr.getReferencePrefix();
-        if (prefix != null) this.visitReferencePrefix(prefix);
+        if (prefix != null) {
+        	this.visitReferencePrefix(prefix);
+        	sequence.add(new Sememe(generator.generateAccessOperator(), 
+        							prefix.getStartPosition(),
+        							AbstractSememe.ACCESS_OPERATOR),
+        				 null
+        	);
+        }
         String owner = "";
         if (prefix != null) owner = this.si.getType(prefix).getName();
         else owner = classStack.peek().getName();
@@ -679,7 +686,7 @@ public class CustomVisitor extends SourceVisitor {
         this.visitExpression(baa.getExpressionAt(0));
         sequence.add(new Sememe(generator.generateBitAndAssignmentSememe(), 
                                 baa.getStartPosition(),
-                                AbstractSememe.BIT_AND_ASSIGNMENT_SEMEME));
+                                AbstractSememe.BIT_AND_ASSIGNMENT_SEMEME), null);
         this.visitExpression(baa.getExpressionAt(1));
     }
     
@@ -689,7 +696,7 @@ public class CustomVisitor extends SourceVisitor {
         this.visitExpression(boa.getExpressionAt(0));
         sequence.add(new Sememe(generator.generateBitOrAssignmentSememe(),
                                 boa.getStartPosition(),
-                                AbstractSememe.BIT_OR_ASSIGNMENT_SEMEME));
+                                AbstractSememe.BIT_OR_ASSIGNMENT_SEMEME), null);
         this.visitExpression(boa.getExpressionAt(1));
     }
     
@@ -699,7 +706,7 @@ public class CustomVisitor extends SourceVisitor {
         this.visitExpression(boa.getExpressionAt(0));
         sequence.add(new Sememe(generator.generateBitXOrAssignmentSememe(),
                                 boa.getStartPosition(),
-                                AbstractSememe.BIT_X_OR_ASSIGNMENT_SEMEME));
+                                AbstractSememe.BIT_X_OR_ASSIGNMENT_SEMEME), null);
         this.visitExpression(boa.getExpressionAt(1));
     }
     
@@ -709,7 +716,7 @@ public class CustomVisitor extends SourceVisitor {
         this.visitExpression(da.getExpressionAt(0));
         sequence.add(new Sememe(generator.generateDivideAssignmentSememe(), 
                                 da.getStartPosition(),
-                                AbstractSememe.DIVIDE_ASSIGNMENT_SEMEME));
+                                AbstractSememe.DIVIDE_ASSIGNMENT_SEMEME), null);
         this.visitExpression(da.getExpressionAt(1));
     }
     
@@ -719,7 +726,7 @@ public class CustomVisitor extends SourceVisitor {
         this.visitExpression(ma.getExpressionAt(0));
         sequence.add(new Sememe(generator.generateMinusAssignmentSememe(),
                                 ma.getStartPosition(),
-                                AbstractSememe.MINUS_ASSIGNMENT_SEMEME));
+                                AbstractSememe.MINUS_ASSIGNMENT_SEMEME), null);
         this.visitExpression(ma.getExpressionAt(1));
     }
     
@@ -729,7 +736,7 @@ public class CustomVisitor extends SourceVisitor {
         this.visitExpression(ma.getExpressionAt(0));
         sequence.add(new Sememe(generator.generateModuloAssignmentSememe(), 
                                 ma.getStartPosition(),
-                                AbstractSememe.MODULO_ASSIGNMENT_SEMEME));
+                                AbstractSememe.MODULO_ASSIGNMENT_SEMEME), null);
         this.visitExpression(ma.getExpressionAt(1));
     }
     
@@ -739,7 +746,7 @@ public class CustomVisitor extends SourceVisitor {
         this.visitExpression(pa.getExpressionAt(0));
         sequence.add(new Sememe(generator.generatePlusAssignmentSememe(), 
                                 pa.getStartPosition(),
-                                AbstractSememe.PLUS_ASSIGNMENT_SEMEME));
+                                AbstractSememe.PLUS_ASSIGNMENT_SEMEME), null);
         this.visitExpression(pa.getExpressionAt(1));
     }
     
@@ -749,7 +756,7 @@ public class CustomVisitor extends SourceVisitor {
         this.visitExpression(da.getExpressionAt(0));
         sequence.add(new Sememe(generator.generateTimesAssignmentSememe(), 
                                 da.getStartPosition(),
-                                AbstractSememe.TIMES_ASSIGNMENT_SEMEME));
+                                AbstractSememe.TIMES_ASSIGNMENT_SEMEME), null);
         this.visitExpression(da.getExpressionAt(1));
     }
     
@@ -759,7 +766,7 @@ public class CustomVisitor extends SourceVisitor {
         this.visitExpression(d.getExpressionAt(0));
         sequence.add(new Sememe(generator.generateDivideSememe(), 
                                 d.getStartPosition(),
-                                AbstractSememe.DIVIDE_SEMEME));
+                                AbstractSememe.DIVIDE_SEMEME), null);
         this.visitExpression(d.getExpressionAt(1));
     }
     
@@ -769,7 +776,7 @@ public class CustomVisitor extends SourceVisitor {
         this.visitExpression(p.getExpressionAt(0));
         sequence.add(new Sememe(generator.generatePlusSememe(), 
                                 p.getStartPosition(),
-                                AbstractSememe.PLUS_SEMEME));
+                                AbstractSememe.PLUS_SEMEME), null);
         this.visitExpression(p.getExpressionAt(1));
     }
     
@@ -779,7 +786,7 @@ public class CustomVisitor extends SourceVisitor {
         this.visitExpression(m.getExpressionAt(0));
         sequence.add(new Sememe(generator.generateMinusSememe(), 
                                 m.getStartPosition(),
-                                AbstractSememe.MINUS_SEMEME));
+                                AbstractSememe.MINUS_SEMEME), null);
         this.visitExpression(m.getExpressionAt(1));
     }
     
@@ -789,7 +796,7 @@ public class CustomVisitor extends SourceVisitor {
         this.visitExpression(t.getExpressionAt(0));
         sequence.add(new Sememe(generator.generateTimesSememe(), 
                                 t.getStartPosition(),
-                                AbstractSememe.TIMES_SEMEME));
+                                AbstractSememe.TIMES_SEMEME), null);
         this.visitExpression(t.getExpressionAt(1));
     }
     
@@ -799,7 +806,7 @@ public class CustomVisitor extends SourceVisitor {
         this.visitExpression(m.getExpressionAt(0));
         sequence.add(new Sememe(generator.generateModuloSememe(), 
                                 m.getStartPosition(),
-                                AbstractSememe.MODULO_SEMEME));
+                                AbstractSememe.MODULO_SEMEME), null);
         this.visitExpression(m.getExpressionAt(1));
     }
     
@@ -808,7 +815,7 @@ public class CustomVisitor extends SourceVisitor {
         System.out.println(n);
         sequence.add(new Sememe(generator.generateNegativeSememe(), 
                                 n.getStartPosition(),
-                                AbstractSememe.NEGATIVE_SEMEME));
+                                AbstractSememe.NEGATIVE_SEMEME), null);
         this.visitExpression(n.getExpressionAt(0));
     }
     
@@ -817,7 +824,7 @@ public class CustomVisitor extends SourceVisitor {
         System.out.println(p);
         sequence.add(new Sememe(generator.generatePositiveSememe(), 
                                 p.getStartPosition(),
-                                AbstractSememe.POSITIVE_SEMEME));
+                                AbstractSememe.POSITIVE_SEMEME), null);
         this.visitExpression(p.getExpressionAt(0));
     }
     
@@ -827,7 +834,7 @@ public class CustomVisitor extends SourceVisitor {
         this.visitExpression(e.getExpressionAt(0));
         sequence.add(new Sememe(generator.generateEqualsSememe(), 
                                 e.getStartPosition(),
-                                AbstractSememe.EQUALS_SEMEME));
+                                AbstractSememe.EQUALS_SEMEME), null);
         this.visitExpression(e.getExpressionAt(1));
     }
     
@@ -837,7 +844,7 @@ public class CustomVisitor extends SourceVisitor {
         this.visitExpression(gt.getExpressionAt(0));
         sequence.add(new Sememe(generator.generateGreaterThanSememe(), 
                                 gt.getStartPosition(),
-                                AbstractSememe.GREATER_THAN_SEMEME));
+                                AbstractSememe.GREATER_THAN_SEMEME), null);
         this.visitExpression(gt.getExpressionAt(1));
     }
     
@@ -847,7 +854,7 @@ public class CustomVisitor extends SourceVisitor {
         this.visitExpression(goet.getExpressionAt(0));
         sequence.add(new Sememe(generator.generateGreaterOrEqualsSememe(), 
                                 goet.getStartPosition(),
-                                AbstractSememe.GREATER_OR_EQUALS_SEMEME));
+                                AbstractSememe.GREATER_OR_EQUALS_SEMEME), null);
         this.visitExpression(goet.getExpressionAt(1));
     }
     
@@ -857,7 +864,7 @@ public class CustomVisitor extends SourceVisitor {
         this.visitExpression(lt.getExpressionAt(0));
         sequence.add(new Sememe(generator.generateLessThanSememe(), 
                                 lt.getStartPosition(),
-                                AbstractSememe.LESS_THAN_SEMEME));
+                                AbstractSememe.LESS_THAN_SEMEME), null);
         this.visitExpression(lt.getExpressionAt(1));
     }
     
@@ -867,7 +874,7 @@ public class CustomVisitor extends SourceVisitor {
         this.visitExpression(loe.getExpressionAt(0));
         sequence.add(new Sememe(generator.generateLessOrEqualsSememe(), 
                                 loe.getStartPosition(),
-                                AbstractSememe.LESS_OR_EQUALS_SEMEME));
+                                AbstractSememe.LESS_OR_EQUALS_SEMEME), null);
         this.visitExpression(loe.getExpressionAt(1));
     }
     
@@ -877,7 +884,7 @@ public class CustomVisitor extends SourceVisitor {
         this.visitExpression(ne.getExpressionAt(0));
         sequence.add(new Sememe(generator.generateNotEqualsSememe(), 
                                 ne.getStartPosition(),
-                                AbstractSememe.NOT_EQUALS_SEMEME));
+                                AbstractSememe.NOT_EQUALS_SEMEME), null);
         this.visitExpression(ne.getExpressionAt(1));
     }
     
@@ -887,7 +894,7 @@ public class CustomVisitor extends SourceVisitor {
         this.visitExpression(la.getExpressionAt(0));
         sequence.add(new Sememe(generator.generateLogicalAndSememe(), 
                                 la.getStartPosition(),
-                                AbstractSememe.LOGICAL_AND_SEMEME));
+                                AbstractSememe.LOGICAL_AND_SEMEME), null);
         this.visitExpression(la.getExpressionAt(1));
     }
     
@@ -897,7 +904,7 @@ public class CustomVisitor extends SourceVisitor {
         this.visitExpression(lo.getExpressionAt(0));
         sequence.add(new Sememe(generator.generateLogicalOrSememe(), 
                                 lo.getStartPosition(),
-                                AbstractSememe.LOGICAL_OR_SEMEME));
+                                AbstractSememe.LOGICAL_OR_SEMEME), null);
         this.visitExpression(lo.getExpressionAt(1));
     }
     
@@ -906,7 +913,7 @@ public class CustomVisitor extends SourceVisitor {
         System.out.println(ln);
         sequence.add(new Sememe(generator.generateLogicalNotSememe(), 
                                 ln.getStartPosition(),
-                                AbstractSememe.LOGICAL_NOT_SEMEME));
+                                AbstractSememe.LOGICAL_NOT_SEMEME), null);
         this.visitExpression(ln.getExpressionAt(0));
     }
     
@@ -916,7 +923,7 @@ public class CustomVisitor extends SourceVisitor {
         this.visitExpression(pd.getExpressionAt(0));
         sequence.add(new Sememe(generator.generatePostDecrementSememe(), 
                                 pd.getStartPosition(),
-                                AbstractSememe.POST_DECREMENT_SEMEME));
+                                AbstractSememe.POST_DECREMENT_SEMEME), null);
     }
     
     public void visitPostIncrement(PostIncrement pi){
@@ -925,7 +932,7 @@ public class CustomVisitor extends SourceVisitor {
         this.visitExpression(pi.getExpressionAt(0));
         sequence.add(new Sememe(generator.generatePostIncrementSememe(), 
                                 pi.getStartPosition(),
-                                AbstractSememe.POST_INCREMENT_SEMEME));
+                                AbstractSememe.POST_INCREMENT_SEMEME), null);
     }
     
     public void visitPreDecrement(PreDecrement pd){
@@ -933,7 +940,7 @@ public class CustomVisitor extends SourceVisitor {
         System.out.println(pd);
         sequence.add(new Sememe(generator.generatePreDecrementSememe(), 
                                 pd.getStartPosition(),
-                                AbstractSememe.PRE_DECREMENT_SEMEME));
+                                AbstractSememe.PRE_DECREMENT_SEMEME), null);
         this.visitExpression(pd.getExpressionAt(0));
     }
     
@@ -942,7 +949,7 @@ public class CustomVisitor extends SourceVisitor {
         System.out.println(pi);
         sequence.add(new Sememe(generator.generatePreIncrementSememe(), 
                                 pi.getStartPosition(),
-                                AbstractSememe.PRE_INCREMENT_SEMEME ));
+                                AbstractSememe.PRE_INCREMENT_SEMEME ), null);
         this.visitExpression(pi.getExpressionAt(0));
     }
     
@@ -952,7 +959,7 @@ public class CustomVisitor extends SourceVisitor {
         this.visitExpression(shl.getExpressionAt(0));
         sequence.add(new Sememe(generator.generateShiftLeftSememe(),
                                 shl.getStartPosition(),
-                                AbstractSememe.SHIFT_LEFT_SEMEME));
+                                AbstractSememe.SHIFT_LEFT_SEMEME), null);
         this.visitExpression(shl.getExpressionAt(1));
     }
     
@@ -962,7 +969,7 @@ public class CustomVisitor extends SourceVisitor {
         this.visitExpression(shr.getExpressionAt(0));
         sequence.add(new Sememe(generator.generateShiftRightSememe(),
                                 shr.getStartPosition(),
-                                AbstractSememe.SHIFT_RIGHT_SEMEME));
+                                AbstractSememe.SHIFT_RIGHT_SEMEME), null);
         this.visitExpression(shr.getExpressionAt(1));
     }
     
@@ -972,7 +979,7 @@ public class CustomVisitor extends SourceVisitor {
         this.visitExpression(shla.getExpressionAt(0));
         sequence.add(new Sememe(generator.generateShiftLeftAssignmentSememe(), 
                                 shla.getStartPosition(),
-                                AbstractSememe.SHIFT_LEFT_ASSIGNMENT_SEMEME));
+                                AbstractSememe.SHIFT_LEFT_ASSIGNMENT_SEMEME), null);
         this.visitExpression(shla.getExpressionAt(1));
     }
     
@@ -982,7 +989,7 @@ public class CustomVisitor extends SourceVisitor {
         this.visitExpression(shra.getExpressionAt(0));
         sequence.add(new Sememe(generator.generateShiftRightAssignmentSememe(),
                                 shra.getStartPosition(),
-                                AbstractSememe.SHIFT_RIGHT_ASSIGNMENT_SEMEME));
+                                AbstractSememe.SHIFT_RIGHT_ASSIGNMENT_SEMEME), null);
         this.visitExpression(shra.getExpressionAt(1));
     }
     
@@ -1001,7 +1008,7 @@ public class CustomVisitor extends SourceVisitor {
         this.visitExpression(ushr.getExpressionAt(0));
         sequence.add(new Sememe(generator.generateUnsignedShiftRightSememe(), 
                                 ushr.getStartPosition(),
-                                AbstractSememe.UNSIGNED_SHIFT_RIGHT_SEMEME));
+                                AbstractSememe.UNSIGNED_SHIFT_RIGHT_SEMEME), null);
         this.visitExpression(ushr.getExpressionAt(1));
     }
     
@@ -1011,7 +1018,7 @@ public class CustomVisitor extends SourceVisitor {
         this.visitExpression(ushra.getExpressionAt(0));
         sequence.add(new Sememe(generator.generateUnsignedShiftRightAssignmentSememe(), 
                                 ushra.getStartPosition(),
-                                AbstractSememe.UNSIGNED_SHIFT_RIGHT_ASSIGNMENT_SEMEME));
+                                AbstractSememe.UNSIGNED_SHIFT_RIGHT_ASSIGNMENT_SEMEME), null);
         this.visitExpression(ushra.getExpressionAt(1));
     }
     
@@ -1023,16 +1030,17 @@ public class CustomVisitor extends SourceVisitor {
         List<VariableSpecification> variables = lvd.getVariables();
         sequence.add(new Sememe(generator.generateTypeSememe(type.getName()),
                                 lvd.getStartPosition(),
-                                AbstractSememe.TYPE_SEMEME));
+                                AbstractSememe.TYPE_SEMEME),
+                     type);
         for (VariableSpecification vs : variables){
             sequence.add(new Sememe(generator.generateVariableSememe(type.getName()),
                                     lvd.getStartPosition(),
-                                    AbstractSememe.VARIABLE_SEMEME));
+                                    AbstractSememe.TYPE_SEMEME), type);
             if (vs.getExpressionCount() == 1){
                 System.out.println(vs.getExpressionAt(0));
                 sequence.add(new Sememe(generator.generateAssignSememe(),
                                         lvd.getStartPosition(),
-                                        AbstractSememe.ASSIGN_SEMEME));
+                                        AbstractSememe.ASSIGN_SEMEME), null);
                 this.visitExpression(vs.getExpressionAt(0));
             } else if (vs.getExpressionCount() > 1){
                 GlobalConfig.LOGGER.log("Unhandled local variable declaration expression: " + vs.toSource());
@@ -1045,7 +1053,7 @@ public class CustomVisitor extends SourceVisitor {
         System.out.println(a.toSource());
         sequence.add(new Sememe(generator.generateKeywordSememe("assert"), 
                                 a.getStartPosition(),
-                                AbstractSememe.KEYWORD_SEMEME));
+                                AbstractSememe.KEYWORD_SEMEME), null);
         for (int i=0; i<a.getExpressionCount(); i++){
             this.visitExpression(a.getExpressionAt(i));
         }
@@ -1054,14 +1062,14 @@ public class CustomVisitor extends SourceVisitor {
     public void visitBreak(Break b){
         sequence.add(new Sememe(generator.generateKeywordSememe("break"),
                                 b.getStartPosition(),
-                                AbstractSememe.KEYWORD_SEMEME));
+                                AbstractSememe.KEYWORD_SEMEME), null);
     }
     
     public void visitReturn(Return r){
         System.out.println(r.getExpressionCount());
         sequence.add(new Sememe(generator.generateKeywordSememe("return"), 
                                 r.getStartPosition(),
-                                AbstractSememe.KEYWORD_SEMEME));
+                                AbstractSememe.KEYWORD_SEMEME), null);
         for (int i=0; i<r.getExpressionCount(); i++){
             this.visitExpression(r.getExpressionAt(i));
         }
@@ -1070,7 +1078,7 @@ public class CustomVisitor extends SourceVisitor {
     public void visitContinue(Continue c){
         sequence.add(new Sememe(generator.generateKeywordSememe("continue"),
                                 c.getStartPosition(),
-                                AbstractSememe.KEYWORD_SEMEME));
+                                AbstractSememe.KEYWORD_SEMEME), null);
     }
     
     public void visitThisReference(ThisReference tr){
@@ -1078,7 +1086,7 @@ public class CustomVisitor extends SourceVisitor {
         System.out.println(tr.toSource());
         sequence.add(new Sememe(generator.generateKeywordSememe("this"), 
                                 tr.getStartPosition(),
-                                AbstractSememe.KEYWORD_SEMEME));
+                                AbstractSememe.KEYWORD_SEMEME), null);
     }
     
     public void visitMethodReference(MethodReference mr){
@@ -1089,7 +1097,14 @@ public class CustomVisitor extends SourceVisitor {
         ASTList<Expression> params = mr.getArguments();
         System.out.println(params);
         ReferencePrefix prefix = mr.getReferencePrefix();
-        if (prefix != null) this.visitReferencePrefix(prefix);
+        if (prefix != null) {
+        	this.visitReferencePrefix(prefix);
+        	sequence.add(new Sememe(generator.generateAccessOperator(), 
+						 prefix.getStartPosition(),
+						 AbstractSememe.ACCESS_OPERATOR),
+						 null
+        				 );
+        }
         if (prefix != null) owner = this.si.getType(prefix).getName();
         else owner = classStack.peek().getName();
         //List<ReferencePrefix> prefixes = new ArrayList<ReferencePrefix>();
@@ -1104,7 +1119,7 @@ public class CustomVisitor extends SourceVisitor {
         if (returnType != null) rettype = returnType.getName();
         sequence.add(new Sememe(generator.generateMethodReference(owner, name, paramTypes, rettype), 
                                 mr.getStartPosition(),
-                                AbstractSememe.METHOD_REFERENCE));
+                                AbstractSememe.METHOD_REFERENCE), mr);
         if (params != null){
             for (Expression param : params){
                 this.visitExpression(param);
@@ -1144,13 +1159,14 @@ public class CustomVisitor extends SourceVisitor {
     public void visitTypeReference(TypeReference tr){
         sequence.add(new Sememe(generator.generateTypeSememe(tr.getName()), 
                                 tr.getStartPosition(),
-                                AbstractSememe.TYPE_SEMEME));
+                                AbstractSememe.TYPE_SEMEME),
+                     tr);
     }
     
     public void visitSuperReference(SuperReference sr){
         sequence.add(new Sememe(generator.generateKeywordSememe("super"), 
                                 sr.getStartPosition(),
-                                AbstractSememe.KEYWORD_SEMEME));
+                                AbstractSememe.KEYWORD_SEMEME), null);
     }
     
     public void visitPackageReference(PackageReference pr){
@@ -1175,15 +1191,15 @@ public class CustomVisitor extends SourceVisitor {
         
         if (prefix != null) owner = this.si.getType(prefix).getName();
         else owner = classStack.peek().getName();
-        ArrayList<String> paramTypes = new ArrayList<String>();
+        ArrayList<Object> paramTypes = new ArrayList<Object>();
         if (params != null){
             for (Expression param : params){
                 paramTypes.add(si.getType(param).getName());
             }
         }
-        sequence.add(new Sememe(generator.generateConstructorReference(owner, paramTypes), 
+        sequence.add(new Sememe(generator.generateConstructorReference(owner, owner, paramTypes), 
                                 scr.getStartPosition(),
-                                AbstractSememe.CONSTRUCTOR_REFERENCE));
+                                AbstractSememe.SPECIAL_CONSTRUCTOR_REFERENCE), scr);
     }
     
     public void visitEnhancedFor(EnhancedFor ef){
@@ -1194,7 +1210,7 @@ public class CustomVisitor extends SourceVisitor {
         System.out.println(ef.getInitializers());
         sequence.add(new Sememe(generator.generateKeywordSememe("for"), 
                                 ef.getStartPosition(),
-                                AbstractSememe.KEYWORD_SEMEME));
+                                AbstractSememe.KEYWORD_SEMEME), null);
         ASTList<LoopInitializer> inits = ef.getInitializers();
         for (LoopInitializer i : inits){
             this.visitStatement((Statement)i);
@@ -1219,7 +1235,7 @@ public class CustomVisitor extends SourceVisitor {
         System.out.println(f.getInitializers());
         sequence.add(new Sememe(generator.generateKeywordSememe("for"),
                                 f.getStartPosition(),
-                                AbstractSememe.KEYWORD_SEMEME));
+                                AbstractSememe.KEYWORD_SEMEME), null);
         ASTList<LoopInitializer> inits = f.getInitializers();
         for (LoopInitializer i : inits){
             this.visitStatement((Statement)i);
@@ -1247,7 +1263,7 @@ public class CustomVisitor extends SourceVisitor {
         System.out.println(i.getBranchCount());
         sequence.add(new Sememe(generator.generateKeywordSememe("if"), 
                                 i.getStartPosition(),
-                                AbstractSememe.KEYWORD_SEMEME));
+                                AbstractSememe.KEYWORD_SEMEME), null);
         Expression condition = i.getExpressionAt(0);
         this.visitExpression(condition);
         this.visitThen(i.getThen());
@@ -1272,6 +1288,9 @@ public class CustomVisitor extends SourceVisitor {
     public void visitElse(Else e){
         Statement body = e.getBody();
         System.out.println(body);
+        sequence.add(new Sememe(generator.generateKeywordSememe("else"), 
+                				e.getStartPosition(),
+                				AbstractSememe.KEYWORD_SEMEME), null);
         if (body instanceof StatementBlock){
             //sequence.add(new SememeWithLexeme(generator.generateElseBegin(), e.getStartPosition()));
             this.visitStatement(body);
@@ -1285,7 +1304,7 @@ public class CustomVisitor extends SourceVisitor {
         Expression target = c.getExpressionAt(0);
         sequence.add(new Sememe(generator.generateKeywordSememe("case"), 
                                 c.getStartPosition(),
-                                AbstractSememe.KEYWORD_SEMEME));
+                                AbstractSememe.KEYWORD_SEMEME), null);
         this.visitExpression(target);
         ASTList<Statement> body = c.getBody();
         if (body != null){
@@ -1298,7 +1317,7 @@ public class CustomVisitor extends SourceVisitor {
     public void visitDefault(Default d){
         sequence.add(new Sememe(generator.generateKeywordSememe("default"), 
                                 d.getStartPosition(),
-                                AbstractSememe.KEYWORD_SEMEME));
+                                AbstractSememe.KEYWORD_SEMEME), null);
         ASTList<Statement> body = d.getBody();
         if (body != null){
             for (Statement b : body){
@@ -1310,7 +1329,7 @@ public class CustomVisitor extends SourceVisitor {
     public void visitCatch(Catch c){
         sequence.add(new Sememe(generator.generateKeywordSememe("catch"),
                                 c.getStartPosition(),
-                                AbstractSememe.KEYWORD_SEMEME));
+                                AbstractSememe.KEYWORD_SEMEME), null);
         for (int i=0; i<c.getParameterDeclarationCount(); i++){
             ParameterDeclaration para = c.getParameterDeclarationAt(i);
             this.visitParameterDeclaration(para);
@@ -1328,7 +1347,7 @@ public class CustomVisitor extends SourceVisitor {
     public void visitFinally(Finally f){
         sequence.add(new Sememe(generator.generateKeywordSememe("finally"), 
                                 f.getStartPosition(),
-                                AbstractSememe.KEYWORD_SEMEME));
+                                AbstractSememe.KEYWORD_SEMEME), null);
         Statement body = f.getBody();
         if (body != null){
             if (body instanceof StatementBlock){
@@ -1343,7 +1362,8 @@ public class CustomVisitor extends SourceVisitor {
         TypeReference type = pd.getTypeReference();
         sequence.add(new Sememe(generator.generateTypeSememe(type.getName()), 
                                 pd.getStartPosition(),
-                                AbstractSememe.TYPE_SEMEME));
+                                AbstractSememe.TYPE_SEMEME),
+                     type);
     }
     
     public void visitDo(Do d){
@@ -1391,7 +1411,7 @@ public class CustomVisitor extends SourceVisitor {
         System.out.println(tc.getTypeReference());
         sequence.add(new Sememe(generator.generateTypeCastSememe(tc.getTypeReference().getName()), 
                                 tc.getStartPosition(),
-                                AbstractSememe.TYPE_CAST_SEMEME));
+                                AbstractSememe.TYPE_CAST_SEMEME), tc);
         System.out.println(tc.getExpressionCount());
         this.visitExpression(tc.getExpressionAt(0));
     }
@@ -1403,7 +1423,7 @@ public class CustomVisitor extends SourceVisitor {
         this.visitExpression(c.getExpressionAt(0));
         sequence.add(new Sememe(generator.generateTernarySememe(), 
                                 c.getStartPosition(),
-                                AbstractSememe.TERNARY_SEMEME));
+                                AbstractSememe.TERNARY_SEMEME), c);
         this.visitExpression(c.getExpressionAt(1));
         this.visitExpression(c.getExpressionAt(2));
     }
@@ -1411,7 +1431,7 @@ public class CustomVisitor extends SourceVisitor {
     public void visitInstanceof(Instanceof i){
         sequence.add(new Sememe(generator.generateKeywordSememe("instanceof"), 
                                 i.getStartPosition(),
-                                AbstractSememe.KEYWORD_SEMEME));
+                                AbstractSememe.KEYWORD_SEMEME), null);
     }
     
     public void visitNew(New i){
@@ -1425,9 +1445,9 @@ public class CustomVisitor extends SourceVisitor {
         if (arguments != null){
             for (Expression arg : arguments) argumentList.add(arg);
         }
-        sequence.add(new Sememe(generator.generateMethodReference(type.getName(), type.getName(), argumentList, "void"), 
+        sequence.add(new Sememe(generator.generateConstructorReference(type.getName(), type.getName(), argumentList), 
                                 type.getStartPosition(),
-                                AbstractSememe.METHOD_REFERENCE));
+                                AbstractSememe.CONSTRUCTOR_REFERENCE), i);
         if (arguments != null){
             for (Expression arg : arguments){
                 this.visitExpression(arg);
@@ -1439,55 +1459,55 @@ public class CustomVisitor extends SourceVisitor {
         boolean value = bl.getValue();
         sequence.add(new Sememe(generator.generateBooleanLiteralSememe(value), 
                                 bl.getStartPosition(),
-                                AbstractSememe.BOOLEAN_LITERAL_SEMEME));
+                                AbstractSememe.BOOLEAN_LITERAL_SEMEME), bl);
     }
     
     public void visitIntLiteral(IntLiteral il){
         String value = il.getValue();
         sequence.add(new Sememe(generator.generateIntLiteralSememe(value),
                                 il.getStartPosition(),
-                                AbstractSememe.INT_LITERAL_SEMEME));
+                                AbstractSememe.INT_LITERAL_SEMEME), il);
     }
     
     public void visitCharLiteral(CharLiteral cl){
         String value = cl.getValue();
         sequence.add(new Sememe(generator.generateCharLiteralSememe(value), 
                                 cl.getStartPosition(),
-                                AbstractSememe.CHAR_LITERAL_SEMEME));
+                                AbstractSememe.CHAR_LITERAL_SEMEME), cl);
     }
     
     public void visitStringLiteral(StringLiteral sl){
         String value = sl.getValue();
         sequence.add(new Sememe(generator.generateStringLiteralSememe(value), 
                                 sl.getStartPosition(),
-                                AbstractSememe.STRING_LITERAL_SEMEME));
+                                AbstractSememe.STRING_LITERAL_SEMEME), sl);
     }
     
     public void visitDoubleLiteral(DoubleLiteral dl){
         String value = dl.getValue();
         sequence.add(new Sememe(generator.generateDoubleLiteralSememe(value), 
                                 dl.getStartPosition(),
-                                AbstractSememe.DOUBLE_LITERAL_SEMEME));
+                                AbstractSememe.DOUBLE_LITERAL_SEMEME), dl);
     }
     
     public void visitFloatLiteral(FloatLiteral fl){
         String value = fl.getValue();
         sequence.add(new Sememe(generator.generateFloatLiteralSememe(value), 
                                 fl.getStartPosition(),
-                                AbstractSememe.FLOAT_LITERAL_SEMEME));
+                                AbstractSememe.FLOAT_LITERAL_SEMEME), fl);
     }
     
     public void visitNullLiteral(NullLiteral nl){
         sequence.add(new Sememe(generator.generateNullLiteralSememe(), 
                                 nl.getStartPosition(),
-                                AbstractSememe.NULL_LITERAL_SEMEME));
+                                AbstractSememe.NULL_LITERAL_SEMEME), nl);
     }
     
     public void visitLongLiteral(LongLiteral ll){
         String value = ll.getValue();
         sequence.add(new Sememe(generator.generateLongLiteralSememe(value), 
                                 ll.getStartPosition(),
-                                AbstractSememe.LONG_LITERAL_SEMEME));
+                                AbstractSememe.LONG_LITERAL_SEMEME), ll);
     }
     
     public List<AbstractSememe> parsedSememe(){

@@ -7,4 +7,5 @@ public class GlobalConfig {
 //	public static String INPUT_PATH = "/Users/VuTran/teaching_assistant/se&ml/SLAMC/Eclipse_workspace/SLAMCTool_inputs";
 	public static String INPUT_PATH = "SLAMCTool_inputs";
 	public static SLAMCLogger LOGGER = new SLAMCLogger("log/default.log");
+	public static SLAMCLogger LEXEME_LOGGER = new SLAMCLogger("log/lexeme.log");
 }

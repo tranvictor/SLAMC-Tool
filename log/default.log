@@ -11,14 +11,14 @@ Unhandled statement class recoder.java.statement.EmptyStatement
 9:     TYPE[boolean] FIELD[GettingStarted,isStarted] OP[Assign] TRUE OP[LogicAnd] FALSE OP[LogicOr] TRUE FIELD[GettingStarted,isFinished] 
 10:     TYPE[List] FIELD[GettingStarted,someString] 
 12:                                                        FUNC[GettingStarted,outputMessage,PARA[String,PrintStream,],void] 
-13:         VAR[PrintStream] CALL[PrintStream,println,1,void] VAR[String] 
+13:         VAR[PrintStream] OP[Access] CALL[PrintStream,println,1,void] VAR[String] 
 16:                                                        FUNC[GettingStarted,testMethod,PARA[int,int,String,],String] 
 17:           RETURN LIT[String] 
 20:                                         FUNC[GettingStarted,mainFunction,PARA[String,],void] 
 21:         TYPE[int] VAR[int] OP[Assign] ZERO VAR[int] VAR[int] 
 22:         TYPE[StringBuffer] VAR[StringBuffer] VAR[StringBuffer] VAR[StringBuffer] 
-23:         TYPE[StringBuffer] VAR[StringBuffer] OP[Assign] NEW CALL[StringBuffer,StringBuffer,0,void] 
-24:         TYPE[BufferedReader] VAR[BufferedReader] OP[Assign] NEW CALL[BufferedReader,BufferedReader,1,void] NEW CALL[FileReader,FileReader,1,void] VAR[String] 
+23:         TYPE[StringBuffer] VAR[StringBuffer] OP[Assign] NEW CONSTRUCT[StringBuffer,StringBuffer,0] 
+24:         TYPE[BufferedReader] VAR[BufferedReader] OP[Assign] NEW CONSTRUCT[BufferedReader,BufferedReader,1] NEW CONSTRUCT[FileReader,FileReader,1] VAR[String] 
 25:         TYPE[String] VAR[String] 
 26:                 TYPE[int] VAR[int] OP[Assign] LIT[Int] 
 27:                 TYPE[float] VAR[float] 
@@ -35,14 +35,14 @@ Unhandled statement class recoder.java.statement.EmptyStatement
 38:                 VAR[int] OP[OrAssign] VAR[int] 
 39:                 VAR[int] OP[XOrAssign] VAR[int] 
 40:                 VAR[int] OP[DivAssign] LIT[Int] 
-42:         WHILE VAR[String] OP[Assign] VAR[BufferedReader] CALL[BufferedReader,readLine,0,String] OP[Ne] NULL 
-43:             VAR[StringBuffer] CALL[StringBuffer,append,1,StringBuffer] VAR[String] OP[Plus] LIT[Char] 
+42:         WHILE VAR[String] OP[Assign] VAR[BufferedReader] OP[Access] CALL[BufferedReader,readLine,0,String] OP[Ne] NULL 
+43:             VAR[StringBuffer] OP[Access] CALL[StringBuffer,append,1,StringBuffer] VAR[String] OP[Plus] LIT[Char] 
 45:                 VAR[String] OP[Assign] LIT[String] 
 46:                 VAR[String] OP[Assign] LIT[String] OP[Plus] LIT[String] 
 47:                 FIELD[GettingStarted,isStarted] OP[Assign] TRUE 
-48:                 TYPE[A] FIELD[A,temp] OP[Assign] LIT[Int] 
-49:         VAR[BufferedReader] CALL[BufferedReader,close,0,void] 
-50:         VAR[String] CALL[String,isEmpty,0,boolean] 
+48:                 TYPE[A] OP[Access] FIELD[A,temp] OP[Assign] LIT[Int] 
+49:         VAR[BufferedReader] OP[Access] CALL[BufferedReader,close,0,void] 
+50:         VAR[String] OP[Access] CALL[String,isEmpty,0,boolean] 
 51:                 DO 
 52:                   VAR[int] OP[ModAssign] LIT[Int] 
 53:                    VAR[int] OP[Assign] LIT[Int] 
@@ -51,27 +51,28 @@ Unhandled statement class recoder.java.statement.EmptyStatement
 57:                 VAR[float] OP[Assign] LIT[Int] OP[Le] LIT[Int] OP[Ternay] ZERO LIT[Int] 
 58:                 WHILE VAR[int] OP[Eq] LIT[Int] 
 59:                   VAR[int] OP[Assign] LIT[Int] 
-61:                 THIS FIELD[GettingStarted,isStarted] OP[Assign] FALSE 
-62:                 THIS CALL[GettingStarted,testMethod,3,String] LIT[Int] LIT[Int] LIT[String] 
+61:                 THIS OP[Access] FIELD[GettingStarted,isStarted] OP[Assign] FALSE 
+62:                 THIS OP[Access] CALL[GettingStarted,testMethod,3,String] LIT[Int] LIT[Int] LIT[String] 
 63:                 CALL[GettingStarted,testMethod,3,String] LIT[Int] LIT[Int] LIT[String] 
 64:                 FOR TYPE[int] VAR[int] VAR[int[]] 
-65:                   TYPE[System] FIELD[System,out] CALL[PrintStream,println,1,void] VAR[int] 
+65:                   TYPE[System] OP[Access] FIELD[System,out] OP[Access] CALL[PrintStream,println,1,void] VAR[int] 
 67:                 FOR TYPE[int] VAR[int] OP[Assign] ZERO VAR[int] OP[Lt] LIT[Int] VAR[int] OP[PostInc] 
-68:                   TYPE[System] FIELD[System,out] CALL[PrintStream,println,1,void] VAR[int] 
+68:                   TYPE[System] OP[Access] FIELD[System,out] OP[Access] CALL[PrintStream,println,1,void] VAR[int] 
 69:                 FOR TYPE[int] VAR[int] OP[Assign] LIT[Int] 
-70:                   TYPE[System] FIELD[System,out] CALL[PrintStream,println,1,void] VAR[int] 
-72:                 IF VAR[StringBuffer] CALL[StringBuffer,length,0,int] OP[Gt] ZERO 
-73:             CALL[GettingStarted,outputMessage,2,void] VAR[StringBuffer] CALL[StringBuffer,toString,0,String] TYPE[System] FIELD[System,out] 
+70:                   TYPE[System] OP[Access] FIELD[System,out] OP[Access] CALL[PrintStream,println,1,void] VAR[int] 
+72:                 IF VAR[StringBuffer] OP[Access] CALL[StringBuffer,length,0,int] OP[Gt] ZERO 
+73:             CALL[GettingStarted,outputMessage,2,void] VAR[StringBuffer] OP[Access] CALL[StringBuffer,toString,0,String] TYPE[System] OP[Access] FIELD[System,out] 
 74:             IF VAR[int] OP[Ne] ZERO 
-75:                 TYPE[System] FIELD[System,out] CALL[PrintStream,println,1,void] LIT[String] 
+75:                 TYPE[System] OP[Access] FIELD[System,out] OP[Access] CALL[PrintStream,println,1,void] LIT[String] 
 76:                 DO 
-77:                     VAR[StringBuffer] CALL[StringBuffer,append,1,StringBuffer] LIT[String] 
-78:                     IF VAR[StringBuffer] CALL[StringBuffer,length,0,int] OP[Gt] LIT[Int] 
-79:                         TYPE[System] FIELD[System,out] CALL[PrintStream,print,1,void] LIT[String] 
+77:                     VAR[StringBuffer] OP[Access] CALL[StringBuffer,append,1,StringBuffer] LIT[String] 
+78:                     IF VAR[StringBuffer] OP[Access] CALL[StringBuffer,length,0,int] OP[Gt] LIT[Int] 
+79:                         TYPE[System] OP[Access] FIELD[System,out] OP[Access] CALL[PrintStream,print,1,void] LIT[String] 
 80:                         BREAK 
 82:                               WHILE TRUE 
-84:                 TYPE[System] FIELD[System,out] CALL[PrintStream,println,1,void] TRUE 
-87:                 THIS FIELD[GettingStarted,intMember] OP[Assign] LIT[Int] 
+83:               ELSE 
+84:                 TYPE[System] OP[Access] FIELD[System,out] OP[Access] CALL[PrintStream,println,1,void] TRUE 
+87:                 THIS OP[Access] FIELD[GettingStarted,intMember] OP[Assign] LIT[Int] 
 90:                                              FUNC[GettingStarted,main,PARA[String,],void] 
 91:             TYPE[String] VAR[String] OP[Assign] LIT[String] 
-92:             TYPE[System] FIELD[System,out] CALL[PrintStream,println,1,void] VAR[String] CALL[String,hashCode,0,int] 
+92:             TYPE[System] OP[Access] FIELD[System,out] OP[Access] CALL[PrintStream,println,1,void] VAR[String] OP[Access] CALL[String,hashCode,0,int] 
