@@ -176,7 +176,7 @@ public class CustomVisitor extends SourceVisitor {
             System.out.println(v.getExpressionCount());
             sequence.add(new Sememe(generator.generateFieldSememe(owner.getName(), v.getName()), 
                     fd.getStartPosition(),
-                    Sememe.FIELD_SEMEME));
+                    Sememe.FIELD_SEMEME), v);
             if (v.getExpressionCount() == 1){
                 sequence.add(new Sememe(generator.generateAssignSememe(), 
                                         fd.getStartPosition(),
@@ -619,7 +619,7 @@ public class CustomVisitor extends SourceVisitor {
     public void visitVariableReference(VariableReference vr){
         sequence.add(new Sememe(generator.generateVariableSememe(this.si.getType(vr).getName()), 
                                 vr.getStartPosition(),
-                                Sememe.VARIABLE_SEMEME));
+                                Sememe.VARIABLE_SEMEME), vr);
     }
     
     public void visitFieldReference(FieldReference fr){
@@ -638,7 +638,7 @@ public class CustomVisitor extends SourceVisitor {
         System.out.println(owner);
         sequence.add(new Sememe(generator.generateFieldSememe(owner, fr.getName()), 
                                 fr.getStartPosition(),
-                                Sememe.FIELD_SEMEME));
+                                Sememe.FIELD_SEMEME), fr);
     }
     
     public void visitBinaryAnd(BinaryAnd ba){
@@ -1035,7 +1035,7 @@ public class CustomVisitor extends SourceVisitor {
         for (VariableSpecification vs : variables){
             sequence.add(new Sememe(generator.generateVariableSememe(type.getName()),
                                     lvd.getStartPosition(),
-                                    AbstractSememe.TYPE_SEMEME), type);
+                                    AbstractSememe.VARIABLE_SEMEME), vs);
             if (vs.getExpressionCount() == 1){
                 System.out.println(vs.getExpressionAt(0));
                 sequence.add(new Sememe(generator.generateAssignSememe(),
