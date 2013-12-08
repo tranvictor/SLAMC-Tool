@@ -1531,4 +1531,8 @@ public class CustomVisitor extends SourceVisitor {
         }
         return result;
     }
+    
+    public String resultLexemes(){
+    	return sequence.associatedLexemes();
+    }
 }

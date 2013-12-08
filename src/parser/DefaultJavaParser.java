@@ -43,6 +43,7 @@ public class DefaultJavaParser implements JavaParser {
 					CustomVisitor visitor = new CustomVisitor(crsc);
 					cu.accept(visitor);
 					GlobalConfig.LOGGER.log(visitor.readableSememe());
+					GlobalConfig.LEXEME_RESULT_LOGGER.log(visitor.resultLexemes());
 				}
 			}
 			GlobalConfig.LOGGER.close();

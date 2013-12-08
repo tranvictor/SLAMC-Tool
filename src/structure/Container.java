@@ -3,6 +3,7 @@ package structure;
 import java.util.ArrayList;
 import java.util.List;
 
+import cern.colt.list.ObjectArrayList;
 import cern.colt.map.OpenIntObjectHashMap;
 
 public class Container {
@@ -23,5 +24,9 @@ public class Container {
 			container.put(hash, newElement);
 		}
 		return true;
+	}
+	
+	public ObjectArrayList values(){
+		return container.values();
 	}
 }
