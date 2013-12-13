@@ -245,7 +245,7 @@ public class SememeSequence extends ArrayList<AbstractSememe> {
 	}
 
 	private Lexeme assoicatedLexeme(Conditional e) {
-		Lexeme result = new Lexeme("(<e>) ? (<e>) : (<e>)");;
+		Lexeme result = new Lexeme("( ) ? ( ) : ( )");;
 		GlobalConfig.LEXEME_LOGGER.log("Ternary: " + result.getLexeme());
 		return result;
 	}
@@ -382,13 +382,13 @@ public class SememeSequence extends ArrayList<AbstractSememe> {
 		case AbstractSememe.LOGICAL_NOT_SEMEME:
 			lex = "!"; break;
 		case AbstractSememe.POST_DECREMENT_SEMEME:
-			lex = "<e>--"; break;
+			lex = "--"; break;
 		case AbstractSememe.POST_INCREMENT_SEMEME:
-			lex = "<e>++"; break;
+			lex = "++"; break;
 		case AbstractSememe.PRE_DECREMENT_SEMEME:
-			lex = "--<e>"; break;
+			lex = "-- "; break;
 		case AbstractSememe.PRE_INCREMENT_SEMEME:
-			lex = "++<e>"; break;
+			lex = "++ "; break;
 		case AbstractSememe.SHIFT_LEFT_SEMEME:
 			lex = "<<"; break;
 		case AbstractSememe.SHIFT_RIGHT_SEMEME:
@@ -404,16 +404,16 @@ public class SememeSequence extends ArrayList<AbstractSememe> {
 		case AbstractSememe.KEYWORD_SEMEME:
 			switch (s.getSememe()){
 			case "TRY": lex = "try { }"; break;
-			case "SWITCH": lex = "switch (<e>){ }"; break;
-			case "FOR": lex = "for (<e>; <e>; <e>) { }"; break;
-			case "IF": lex = "if (<e>) { }"; break;
+			case "SWITCH": lex = "switch ( ){ }"; break;
+			case "FOR": lex = "for ( ;  ;  ) { }"; break;
+			case "IF": lex = "if ( ) { }"; break;
 			case "ELSE": lex = "else { }"; break;
-			case "CASE": lex = "case <e>:"; break;
+			case "CASE": lex = "case  :"; break;
 			case "DEFAULT": lex = "default:"; break;
-			case "CATCH": lex = "catch (<e>) { }"; break;
+			case "CATCH": lex = "catch ( ) { }"; break;
 			case "FINALLY": lex = "finally { }"; break;
 			case "DO": lex = "do { }"; break;
-			case "WHILE": lex = "while (<e>) { }"; break;
+			case "WHILE": lex = "while ( ) { }"; break;
 			default: lex = s.getSememe().toLowerCase();
 			}
 		}
